@@ -107,6 +107,7 @@
     <label><span>Cam</span>
       <select id="sel-cam"><option value="">Auto</option></select>
     </label>
+    <button id="btn-video" title="Afficher/masquer l'image de la caméra">🖼 IMAGE</button>
     <label><span>Vol</span>
       <input id="rng-vol" type="range" min="0" max="1" step="0.01" value="0.7">
     </label>
@@ -160,6 +161,7 @@ function freqToNoteName(f) {
 let rootMidi   = 60;
 let running    = false;
 let mirrored   = true;
+let showVideo  = false;
 let handChoice = 'left';       // 'left' or 'right' from user's perspective
 let currentFreq = 0;
 let activeVol   = 0;
@@ -249,6 +251,12 @@ function frameLoop() {
   }
   animFrame = requestAnimationFrame(frameLoop);
 }
+
+const btnVideo = document.getElementById('btn-video');
+btnVideo.addEventListener('click', () => {
+  showVideo = !showVideo;
+  btnVideo.classList.toggle('on', showVideo);
+});
 
 selCam.addEventListener('change', async () => {
   if (running) {
@@ -577,10 +585,12 @@ function drawFrame(res) {
   ctx2d.clearRect(0, 0, W, H);
 
   // Vidéo (miroir si besoin)
-  ctx2d.save();
-  if (mirrored) { ctx2d.translate(W, 0); ctx2d.scale(-1, 1); }
-  ctx2d.drawImage(video, 0, 0, W, H);
-  ctx2d.restore();
+  if (showVideo) {
+    ctx2d.save();
+    if (mirrored) { ctx2d.translate(W, 0); ctx2d.scale(-1, 1); }
+    ctx2d.drawImage(video, 0, 0, W, H);
+    ctx2d.restore();
+  }
 
   // Mains + contrôle
   let controlled = false;
